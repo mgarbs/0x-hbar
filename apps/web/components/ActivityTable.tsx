@@ -89,7 +89,11 @@ export function ActivityTable() {
         </span>
         <span className="flex items-center gap-4">
           <Chip k="poll" v="3s" />
-          <Chip k="sse" v={sse === "open" ? "LIVE" : sse.toUpperCase()} tone={sse === "open" ? "good" : "warn"} />
+          <Chip
+            k="sse"
+            v={sse === "open" ? "LIVE" : sse === "connecting" ? "…" : "off"}
+            tone={sse === "open" ? "good" : "warn"}
+          />
         </span>
       </div>
     </section>
@@ -132,21 +136,32 @@ function FilterPills({
 function ConnectionBadge({ status }: { status: "connecting" | "open" | "closed" }) {
   if (status === "open") {
     return (
-      <span className="flex items-center gap-2 text-[10px] font-mono text-good uppercase tracking-[0.22em]">
+      <span
+        className="flex items-center gap-2 text-[10px] font-mono text-good uppercase tracking-[0.22em]"
+        title="Server-sent events connected — updates stream as they happen"
+      >
         <span className="ring-dot" /> streaming
       </span>
     );
   }
   if (status === "connecting") {
     return (
-      <span className="flex items-center gap-2 text-[10px] font-mono text-warn uppercase tracking-[0.22em]">
+      <span
+        className="flex items-center gap-2 text-[10px] font-mono text-warn uppercase tracking-[0.22em]"
+        title="Connecting to event stream…"
+      >
         <span className="ring-dot-warn" /> connecting
       </span>
     );
   }
+  // SSE closed — but REST polling still updates the table every few seconds.
+  // Label accurately instead of alarming-looking "offline".
   return (
-    <span className="flex items-center gap-2 text-[10px] font-mono text-bad uppercase tracking-[0.22em]">
-      <span className="ring-dot-off" /> offline
+    <span
+      className="flex items-center gap-2 text-[10px] font-mono text-warn-bright uppercase tracking-[0.22em]"
+      title="Live event stream unavailable — refreshing via poll"
+    >
+      <span className="ring-dot-warn" /> polling · 3s
     </span>
   );
 }

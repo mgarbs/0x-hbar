@@ -8,11 +8,20 @@ import { log } from "../logger.js";
 
 export function sseHandler() {
   return async (c: Context) => {
+    // Prevent proxy buffering (Cloudflare tunnels, nginx, etc.).
+    c.header("X-Accel-Buffering", "no");
+    c.header("Cache-Control", "no-cache, no-transform");
+    c.header("Connection", "keep-alive");
+
     return streamSSE(c, async (stream) => {
       const listener = postgres(config.DATABASE_URL, {
         max: 1,
         idle_timeout: 0,
       });
+
+      // Initial 2KB comment padding forces proxies that buffer on content-length
+      // or chunk size to flush the first frame immediately.
+      await stream.write(`: ${":".repeat(2048)}\n\n`);
 
       await stream.writeSSE({
         event: "hello",
@@ -51,11 +60,12 @@ export function sseHandler() {
         listener.end({ timeout: 5 });
       });
 
+      // Heartbeat every 5s keeps the tunnel warm + keeps EventSource happy.
       const heartbeat = setInterval(() => {
         stream.writeSSE({ event: "ping", data: "1" }).catch(() => {
           closed = true;
         });
-      }, 15_000);
+      }, 5_000);
 
       try {
         while (!closed) {

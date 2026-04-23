@@ -36,23 +36,29 @@ export function ApiStatusBanner() {
   if (status === "ok" || status === "checking") return null;
 
   return (
-    <div className="mb-6 rounded-xl border border-warn/40 bg-warn/10 px-4 py-3 flex items-start gap-3">
-      <span className="mt-0.5 w-2 h-2 rounded-full bg-warn shrink-0" />
+    <div className="rounded-lg border border-warn/40 bg-warn/10 px-4 py-3 flex items-start gap-3">
+      <span className="mt-0.5 w-2 h-2 rounded-full bg-warn animate-pulse shrink-0" />
       <div className="text-sm">
-        <div className="text-warn font-medium">
+        <div className="text-warn-bright font-medium">
           {status === "mixed"
-            ? "Explorer is loaded over HTTPS but the backend is HTTP — the browser blocks the connection."
-            : "Backend API is unreachable."}
+            ? "Browser is blocking the HTTP backend (mixed content)"
+            : "Backend API is unreachable"}
         </div>
         <div className="text-ink-dim mt-1">
-          {status === "mixed"
-            ? "This is the GitHub Pages build of the explorer. Point it at an HTTPS backend by setting the repo variable "
-            : "Is the backend running? Start it with "}
-          <span className="font-mono text-aqua">
-            {status === "mixed" ? "NEXT_PUBLIC_API_BASE" : "pnpm backend"}
-          </span>
-          {status === "mixed" ? " and re-running the Pages workflow, or open the local explorer at " : " and reload, or open the local explorer at "}
-          <span className="font-mono text-aqua">http://localhost:3002</span>.
+          {status === "mixed" ? (
+            <>
+              You&apos;re viewing this over HTTPS but the backend is HTTP. Deploy the backend
+              to an HTTPS host and set{" "}
+              <span className="font-mono text-aqua">NEXT_PUBLIC_API_BASE</span>, or open the
+              local console at{" "}
+              <a href="http://localhost:3002" className="link font-mono">http://localhost:3002</a>.
+            </>
+          ) : (
+            <>
+              Is the backend running? Start it with{" "}
+              <span className="font-mono text-aqua">pnpm backend</span> from the repo root.
+            </>
+          )}
         </div>
       </div>
     </div>

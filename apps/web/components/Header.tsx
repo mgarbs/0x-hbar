@@ -5,95 +5,93 @@ import { Logo } from "./Logo";
 
 export function Header() {
   const { data: cfg } = useConfig();
+  const net = cfg?.network ?? "testnet";
+  const hashscanBase = net === "mainnet" ? "mainnet" : "testnet";
+
   return (
-    <header className="sticky top-0 z-30 border-b border-rule backdrop-blur-xl bg-surface-deep/70">
-      <div className="max-w-[1240px] mx-auto px-6 h-16 flex items-center gap-6">
-        <Link href="/" className="group flex items-center gap-3">
-          <Logo size={32} />
-          <div className="leading-none">
-            <div className="flex items-baseline gap-0.5">
-              <span className="font-mono text-[11px] tracking-[0.18em] text-ink-mute">0x</span>
-              <span className="font-display italic-display text-[26px] font-medium tracking-tightest text-ink leading-none">
-                hbar
-              </span>
-            </div>
-            <div className="mt-0.5 eyebrow text-ink-faint">
-              exchange&nbsp;→&nbsp;evm router
-            </div>
+    <header className="border-b border-rule bg-surface/60 backdrop-blur-xl">
+      <div className="max-w-[1360px] mx-auto px-5 h-14 flex items-center gap-5">
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <Logo size={28} />
+          <div className="flex items-baseline gap-0.5 leading-none">
+            <span className="font-mono text-[10px] tracking-[0.22em] text-ink-mute group-hover:text-ink transition-colors">0x</span>
+            <span className="font-semibold text-[17px] text-ink tracking-tight">hbar</span>
           </div>
+          <span className="hidden sm:inline pill bg-brand/10 text-brand-bright border border-brand/30 ml-2">
+            router
+          </span>
         </Link>
 
-        <div className="hidden md:block h-8 w-px bg-rule" />
-
-        <nav className="hidden md:flex items-center gap-5 text-sm text-ink-dim">
-          <Link href="/" className="hover:text-ink transition-colors">
-            Explorer
-          </Link>
-          <a
-            href="https://github.com/mgarbs/0x-hbar"
-            target="_blank"
-            rel="noreferrer"
-            className="hover:text-ink transition-colors"
-          >
-            GitHub
+        <div className="hidden md:flex items-center gap-4 text-[12px] text-ink-mute pl-4 border-l border-rule-strong">
+          <Link href="/" className="hover:text-ink transition-colors">Console</Link>
+          <a href="https://github.com/mgarbs/0x-hbar" target="_blank" rel="noreferrer" className="hover:text-ink transition-colors">
+            Source
           </a>
-          <a
-            href="https://hashscan.io/testnet"
-            target="_blank"
-            rel="noreferrer"
-            className="hover:text-ink transition-colors"
-          >
+          <a href={`https://hashscan.io/${hashscanBase}`} target="_blank" rel="noreferrer" className="hover:text-ink transition-colors">
             HashScan
           </a>
-        </nav>
+        </div>
 
-        <div className="ml-auto flex items-center gap-3 text-[11px] font-mono text-ink-mute">
+        <div className="ml-auto flex items-center gap-3 text-[11px] font-mono">
           {cfg ? (
             <>
-              <NetBadge network={cfg.network} />
-              <span className="hidden sm:inline-flex items-center gap-1.5">
-                <span className="text-ink-faint">relay</span>
-                <a
-                  href={`https://hashscan.io/${cfg.network === "mainnet" ? "mainnet" : "testnet"}/account/${cfg.operatorAccountId}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-ink hover:text-aqua transition-colors"
-                >
-                  {cfg.operatorAccountId}
-                </a>
-              </span>
-              <span className="hidden lg:inline-flex items-center gap-1.5">
-                <span className="text-ink-faint">treasury</span>
-                <a
-                  href={`https://hashscan.io/${cfg.network === "mainnet" ? "mainnet" : "testnet"}/account/${cfg.treasuryAccountId}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-ink hover:text-aqua transition-colors"
-                >
-                  {cfg.treasuryAccountId}
-                </a>
-              </span>
+              <Pill k="net" v={net} tone={net === "mainnet" ? "bad" : "aqua"} />
+              <Pill
+                k="relay"
+                v={cfg.operatorAccountId}
+                link={`https://hashscan.io/${hashscanBase}/account/${cfg.operatorAccountId}`}
+              />
+              <Pill
+                k="treasury"
+                v={cfg.treasuryAccountId}
+                link={`https://hashscan.io/${hashscanBase}/account/${cfg.treasuryAccountId}`}
+              />
+              <Pill
+                k="fee"
+                v={`${cfg.operatorFeeBps / 100}%`}
+                tone="brand"
+              />
             </>
           ) : (
-            <span className="h-4 w-40 rounded bg-surface-raised animate-pulse" />
+            <span className="h-4 w-44 rounded bg-surface-raised animate-pulse" />
           )}
         </div>
       </div>
-      <div className="hairline" />
     </header>
   );
 }
 
-function NetBadge({ network }: { network: string }) {
-  const isMain = network === "mainnet";
-  return (
-    <span
-      className={`pill-base ${
-        isMain ? "bg-bad/10 text-bad border border-bad/30" : "bg-aqua/10 text-aqua border border-aqua/30"
-      }`}
-    >
-      <span className={`w-1.5 h-1.5 rounded-full ${isMain ? "bg-bad" : "bg-aqua"}`} />
-      {network}
+function Pill({
+  k,
+  v,
+  link,
+  tone = "default",
+}: {
+  k: string;
+  v: string;
+  link?: string;
+  tone?: "default" | "brand" | "aqua" | "bad";
+}) {
+  const toneClass = {
+    default: "bg-surface-raised/80 border-rule-strong text-ink-dim",
+    brand: "bg-brand/10 border-brand/30 text-brand-bright",
+    aqua: "bg-aqua/10 border-aqua/30 text-aqua-bright",
+    bad: "bg-bad/10 border-bad/30 text-bad-bright",
+  }[tone];
+
+  const inner = (
+    <span className={`hidden sm:inline-flex items-center gap-1.5 rounded-md border px-2 py-1 ${toneClass}`}>
+      <span className="text-ink-faint">{k}</span>
+      <span className="text-current">{v}</span>
     </span>
   );
+
+  if (link) {
+    return (
+      <a href={link} target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80">
+        {inner}
+      </a>
+    );
+  }
+  return inner;
 }

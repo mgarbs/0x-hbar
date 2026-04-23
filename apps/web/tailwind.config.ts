@@ -7,36 +7,35 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
-        serif: ["var(--font-display)", "Georgia", "serif"],
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
       colors: {
         ink: {
-          DEFAULT: "#F4F4F8",
-          dim: "#B8B8C7",
-          mute: "#7A7A8E",
-          faint: "#4A4A5A",
+          DEFAULT: "#ECEDEE",
+          dim: "#B4B6BA",
+          mute: "#7F8186",
+          faint: "#4B4E55",
         },
         surface: {
-          deep: "#07070B",
-          DEFAULT: "#0B0B12",
-          raised: "#11111B",
-          elevated: "#181824",
-          lift: "#20202E",
+          deep: "#06070B",
+          DEFAULT: "#0A0B10",
+          raised: "#10131A",
+          elevated: "#161921",
+          lift: "#1C2029",
+          hi: "#242834",
         },
         rule: {
           subtle: "rgba(255,255,255,0.04)",
           DEFAULT: "rgba(255,255,255,0.07)",
-          strong: "rgba(255,255,255,0.14)",
+          strong: "rgba(255,255,255,0.12)",
           brand: "rgba(130,89,239,0.28)",
-          cyan: "rgba(34,211,238,0.25)",
+          aqua: "rgba(34,211,238,0.22)",
         },
         brand: {
           DEFAULT: "#8259EF",
-          bright: "#A78BF0",
+          bright: "#B494F7",
           dim: "#5D3FC4",
           glow: "rgba(130,89,239,0.35)",
-          ink: "#2A1B5A",
         },
         aqua: {
           DEFAULT: "#22D3EE",
@@ -45,67 +44,84 @@ const config: Config = {
           glow: "rgba(34,211,238,0.3)",
         },
         good: {
-          DEFAULT: "#10D9A3",
-          dim: "#0BA884",
-          glow: "rgba(16,217,163,0.28)",
+          DEFAULT: "#10B981",
+          bright: "#34D399",
+          dim: "#047857",
+          glow: "rgba(16,185,129,0.3)",
         },
         warn: {
-          DEFAULT: "#FFC857",
-          dim: "#C8993D",
-          glow: "rgba(255,200,87,0.25)",
+          DEFAULT: "#F59E0B",
+          bright: "#FBBF24",
+          dim: "#B45309",
+          glow: "rgba(245,158,11,0.25)",
         },
         bad: {
-          DEFAULT: "#FF5370",
-          dim: "#D23B57",
-          glow: "rgba(255,83,112,0.28)",
+          DEFAULT: "#F43F5E",
+          bright: "#FB7185",
+          dim: "#BE123C",
+          glow: "rgba(244,63,94,0.25)",
         },
-      },
-      letterSpacing: {
-        "tightest": "-0.04em",
-        "very-wide": "0.2em",
       },
       boxShadow: {
-        glow: "0 0 0 1px rgba(130,89,239,0.4), 0 12px 40px -8px rgba(130,89,239,0.35)",
-        subtle: "0 1px 0 0 rgba(255,255,255,0.04) inset, 0 0 0 1px rgba(255,255,255,0.05)",
-        lift: "0 1px 0 0 rgba(255,255,255,0.06) inset, 0 0 0 1px rgba(255,255,255,0.07), 0 24px 48px -24px rgba(0,0,0,0.6)",
+        card: "0 1px 0 0 rgba(255,255,255,0.03) inset, 0 0 0 1px rgba(255,255,255,0.06)",
+        elevated:
+          "0 1px 0 0 rgba(255,255,255,0.04) inset, 0 0 0 1px rgba(255,255,255,0.08), 0 24px 48px -24px rgba(0,0,0,0.7)",
+        glow: "0 0 0 1px rgba(130,89,239,0.35), 0 0 40px -4px rgba(130,89,239,0.35)",
       },
       backgroundImage: {
-        "grid-dot": `radial-gradient(rgba(255,255,255,0.045) 1px, transparent 1px)`,
-        "brand-gradient":
-          "linear-gradient(135deg,#8259EF 0%,#6236E1 50%,#22D3EE 140%)",
-        "hero-glow":
-          "radial-gradient(ellipse 80% 60% at 50% 0%,rgba(130,89,239,0.25),rgba(34,211,238,0.04) 35%,transparent 70%)",
+        "gradient-brand": "linear-gradient(135deg,#8259EF 0%,#22D3EE 100%)",
+        "gradient-fade":
+          "linear-gradient(180deg,rgba(10,11,16,0) 0%,rgba(10,11,16,1) 100%)",
+        "grid-dot":
+          "radial-gradient(rgba(255,255,255,0.045) 1px,transparent 1px)",
       },
       animation: {
-        pulse: "pulseDot 2.2s cubic-bezier(0.4,0,0.6,1) infinite",
-        ticker: "tickerIn 0.9s cubic-bezier(0.2,0.8,0.2,1) both",
-        shimmer: "shimmer 2.4s linear infinite",
-        sweep: "sweep 3s ease-in-out infinite",
+        marquee: "marquee 30s linear infinite",
+        pulseDot: "pulseDot 2s cubic-bezier(0.4,0,0.6,1) infinite",
+        streak: "streak 1.8s linear infinite",
+        rowEnter: "rowEnter 0.7s cubic-bezier(0.2,0.7,0.2,1) both",
+        draw: "draw 1.1s cubic-bezier(0.2,0.7,0.2,1) both",
+        shimmer: "shimmer 3s linear infinite",
+        scanline: "scanline 8s linear infinite",
       },
       keyframes: {
-        pulseDot: {
-          "0%,100%": { transform: "scale(1)", opacity: "0.9" },
-          "50%": { transform: "scale(1.35)", opacity: "0.45" },
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
         },
-        tickerIn: {
+        pulseDot: {
+          "0%,100%": { boxShadow: "0 0 0 0 rgba(16,185,129,0.6)" },
+          "50%": { boxShadow: "0 0 0 6px rgba(16,185,129,0)" },
+        },
+        streak: {
+          "0%": { transform: "translateX(-100%)", opacity: "0" },
+          "40%": { opacity: "1" },
+          "100%": { transform: "translateX(180%)", opacity: "0" },
+        },
+        rowEnter: {
           "0%": {
-            opacity: "0",
+            background: "rgba(34,211,238,0.10)",
             transform: "translateY(-6px)",
-            boxShadow: "0 0 0 1px rgba(130,89,239,0.55)",
+            opacity: "0",
           },
+          "50%": { background: "rgba(34,211,238,0.08)", opacity: "1" },
           "100%": {
-            opacity: "1",
+            background: "transparent",
             transform: "translateY(0)",
-            boxShadow: "0 0 0 1px rgba(255,255,255,0.07)",
+            opacity: "1",
           },
+        },
+        draw: {
+          "0%": { strokeDashoffset: "var(--dasharray)" },
+          "100%": { strokeDashoffset: "0" },
         },
         shimmer: {
-          "0%": { backgroundPosition: "-200% 0" },
-          "100%": { backgroundPosition: "200% 0" },
+          "0%": { backgroundPosition: "-220% 0" },
+          "100%": { backgroundPosition: "220% 0" },
         },
-        sweep: {
-          "0%,100%": { transform: "translateX(-8%)", opacity: "0.5" },
-          "50%": { transform: "translateX(8%)", opacity: "1" },
+        scanline: {
+          "0%,100%": { transform: "translateY(0%)" },
+          "50%": { transform: "translateY(100%)" },
         },
       },
     },

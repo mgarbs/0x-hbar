@@ -6,72 +6,70 @@ export function HowTo() {
   const relay = cfg?.operatorAccountId ?? "0.0.…";
   const net = cfg?.network === "mainnet" ? "mainnet" : "testnet";
   return (
-    <section className="grid md:grid-cols-3 gap-4">
-      <Step
-        index="01"
-        title="Deposit"
-        copy={
-          <>
-            Withdraw HBAR from any exchange to{" "}
-            <a
-              href={`https://hashscan.io/${net}/account/${relay}`}
-              target="_blank"
-              rel="noreferrer"
-              className="link font-mono"
-            >
-              {relay}
-            </a>{" "}
-            with the memo set to your EVM destination —{" "}
-            <span className="font-mono text-aqua">0x</span> followed by 40 hex characters.
-          </>
-        }
-      />
-      <Step
-        index="02"
-        title="Detect &amp; validate"
-        copy={
-          <>
-            The detector polls the mirror node every <span className="font-mono">500ms</span>,
-            decodes the memo, and checks whether your EVM destination already exists on
-            the network. Malformed memos are routed 100% to treasury.
-          </>
-        }
-      />
-      <Step
-        index="03"
-        title="Atomic forward"
-        copy={
-          <>
-            A single{" "}
-            <span className="font-mono text-aqua">TransferTransaction</span> credits your
-            destination (98%) and treasury (2% + hollow-account create, if needed) in the
-            same consensus round. Either both land or neither.
-          </>
-        }
-      />
+    <section className="card-lift p-6">
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-ink text-[15px] font-semibold tracking-tight">How it works</h3>
+        <span className="text-[10px] font-mono uppercase tracking-[0.22em] text-ink-faint">
+          3 steps · atomic · no custody
+        </span>
+      </div>
+      <div className="grid md:grid-cols-3 gap-4">
+        <Step
+          idx="01"
+          title="Deposit"
+          body={
+            <>
+              Withdraw HBAR from any exchange to the relay account{" "}
+              <a
+                href={`https://hashscan.io/${net}/account/${relay}`}
+                target="_blank"
+                rel="noreferrer"
+                className="link font-mono"
+              >
+                {relay}
+              </a>{" "}
+              with the memo set to your EVM destination (<span className="font-mono text-aqua">0x</span>{" "}
+              + 40 hex).
+            </>
+          }
+        />
+        <Step
+          idx="02"
+          title="Detect"
+          body={
+            <>
+              Detector polls the mirror node every{" "}
+              <span className="font-mono">500ms</span>, decodes the memo, and checks
+              whether your EVM destination already exists. Malformed memos are routed
+              100% to treasury.
+            </>
+          }
+        />
+        <Step
+          idx="03"
+          title="Forward"
+          body={
+            <>
+              A single <span className="font-mono text-aqua">TransferTransaction</span>{" "}
+              credits your destination (98%) and treasury (2% + hollow-create if needed)
+              in the same consensus round. Either both land or neither.
+            </>
+          }
+        />
+      </div>
     </section>
   );
 }
 
-function Step({
-  index,
-  title,
-  copy,
-}: {
-  index: string;
-  title: string;
-  copy: React.ReactNode;
-}) {
+function Step({ idx, title, body }: { idx: string; title: string; body: React.ReactNode }) {
   return (
-    <article className="panel p-6 relative overflow-hidden">
-      <div className="flex items-baseline justify-between">
-        <span className="font-mono text-[11px] text-brand tracking-wider">{index}</span>
-        <span className="w-8 h-px bg-rule" />
+    <div className="bg-surface-raised rounded-lg border border-rule p-4 relative overflow-hidden">
+      <div className="flex items-center justify-between mb-2">
+        <span className="font-mono text-[10px] text-brand-bright tracking-[0.24em]">{idx}</span>
+        <span className="w-6 h-px bg-rule-strong" />
       </div>
-      <h3 className="mt-3 font-display italic-display text-[22px] text-ink leading-snug">
-        {title}
-      </h3>
-      <p className="mt-3 text-sm text-ink-dim leading-relaxed">{copy}</p>
-    </article>
+      <h4 className="text-ink font-semibold text-[14px] mb-1">{title}</h4>
+      <p className="text-[12.5px] text-ink-dim leading-relaxed">{body}</p>
+    </div>
   );
 }

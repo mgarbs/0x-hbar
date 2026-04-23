@@ -3,6 +3,10 @@
 Production HBAR router: exchange `0.0.x` deposit + memo → forward 98% to the
 memo's `0x` EVM address, 2% to treasury, full-transparency explorer.
 
+**Live demo:** https://mgarbs.github.io/0x-hbar/ — real testnet activity,
+streaming into a monitoring dashboard with KPI tiles, throughput charts, and a
+live transaction ledger.
+
 Built because exchanges don't support EVM destinations for Hedera. You withdraw
 to a native `0.0.x` account with an EVM address in the memo; this service
 detects the deposit, validates the memo, and forwards atomically.
@@ -96,6 +100,39 @@ detected → validated → forwarding → forwarded → confirmed
 forwarding    → failed_retry → forwarding …         (exponential backoff)
 failed_retry  → operator_review (after 5 attempts)  (terminal, manual resolution)
 ```
+
+## Making the GH Pages demo serve real data (zero-cost tunnel)
+
+GitHub Pages serves the UI for free, but browsers block HTTPS pages from
+calling HTTP backends (mixed content). Until the backend is on an HTTPS host,
+the fastest path is a **Cloudflare Quick Tunnel** — free, no signup, instant
+HTTPS URL:
+
+```bash
+brew install cloudflared
+cloudflared tunnel --url http://localhost:3001
+# → prints https://<random-words>.trycloudflare.com
+```
+
+Then point the built site at it:
+
+```bash
+gh variable set NEXT_PUBLIC_API_BASE \
+  --repo <you>/0x-hbar \
+  --body https://<random-words>.trycloudflare.com
+gh workflow run pages.yml --repo <you>/0x-hbar
+```
+
+Add the GH Pages origin to backend CORS (already in `.env.example`):
+
+```
+API_CORS_ORIGIN=http://localhost:3002,http://localhost:3000,https://<you>.github.io
+```
+
+The tunnel stays up while `cloudflared` is running on your machine. The tunnel
+URL is random — if you restart it, re-run the variable + workflow commands.
+For a stable URL, use a **named** Cloudflare Tunnel (requires a CF account,
+still free) or deploy the backend to Fly.io / Render (see below).
 
 ## Deploy (free tier, zero-cost)
 

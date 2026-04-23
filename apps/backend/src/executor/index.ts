@@ -1,5 +1,5 @@
-import { sql } from "drizzle-orm";
-import { getDb, type InboundTxRow } from "@0xhbar/db";
+import { eq, sql } from "drizzle-orm";
+import { getDb, inboundTx as inboundTxTable, type InboundTxRow } from "@0xhbar/db";
 import { buildClient } from "@0xhbar/hedera";
 import { buildMirrorClient } from "../detector/mirror.js";
 import { buildHollowResolver } from "./resolver.js";
@@ -86,9 +86,15 @@ async function claimNext(): Promise<InboundTxRow | null> {
     SET status = 'validated', updated_at = NOW()
     FROM next
     WHERE t.id = next.id
-    RETURNING t.*;
+    RETURNING t.id;
   `);
-  const row = (rows as unknown as InboundTxRow[])[0];
+  const claimedId = (rows as unknown as { id: number }[])[0]?.id;
+  if (claimedId == null) return null;
+  const [row] = await db
+    .select()
+    .from(inboundTxTable)
+    .where(eq(inboundTxTable.id, claimedId))
+    .limit(1);
   return row ?? null;
 }
 

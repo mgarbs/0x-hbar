@@ -25,6 +25,10 @@ export async function ingestBatch(
   let highestTs: string | null = null;
 
   for (const t of txs) {
+    // Always advance cursor past every tx we see, not just the ones we insert.
+    if (!highestTs || compareTs(t.consensus_timestamp, highestTs) > 0) {
+      highestTs = t.consensus_timestamp;
+    }
     if (t.name !== "CRYPTOTRANSFER") continue;
     if (t.result !== "SUCCESS") continue;
 
@@ -68,10 +72,6 @@ export async function ingestBatch(
         },
       });
       await db.execute(sql`NOTIFY tx_changed, ${sql.raw(`'${inserted[0]!.id}'`)}`);
-    }
-
-    if (!highestTs || compareTs(t.consensus_timestamp, highestTs) > 0) {
-      highestTs = t.consensus_timestamp;
     }
   }
 

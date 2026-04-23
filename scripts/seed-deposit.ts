@@ -1,38 +1,20 @@
-import "dotenv/config";
+import { config as loadEnv } from "dotenv";
+import { fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import {
   Client,
   AccountCreateTransaction,
   AccountId,
   Hbar,
-  HbarUnit,
   PrivateKey,
   TransferTransaction,
   Status,
 } from "@hashgraph/sdk";
 
-const args = parseArgs({
-  options: {
-    amount: { type: "string", default: "2" },
-    memo: { type: "string", default: "0xdac17f958d2ee523a2206206994597c13d831ec7" },
-    fund: { type: "string", default: "3" },
-  },
-}).values;
-
-const OPERATOR_ID = required("OPERATOR_ACCOUNT_ID");
-const OPERATOR_KEY = required("OPERATOR_PRIVATE_KEY");
-const amountHbar = Number(args.amount);
-const fundHbar = Number(args.fund);
-const memo = String(args.memo);
-
-if (!Number.isFinite(amountHbar) || amountHbar <= 0) {
-  console.error("invalid --amount");
-  process.exit(1);
-}
-if (fundHbar < amountHbar) {
-  console.error("--fund must be >= --amount (plus enough for fees)");
-  process.exit(1);
-}
+const here = dirname(fileURLToPath(import.meta.url));
+const repoRoot = resolve(here, "..");
+loadEnv({ path: resolve(repoRoot, ".env") });
 
 function required(k: string): string {
   const v = process.env[k];
@@ -46,44 +28,76 @@ function parseKey(raw: string): PrivateKey {
   return PrivateKey.fromString(raw);
 }
 
-const client = Client.forTestnet();
-const operatorId = AccountId.fromString(OPERATOR_ID);
-const operatorKey = parseKey(OPERATOR_KEY);
-client.setOperator(operatorId, operatorKey);
+async function main() {
+  const rawArgs = process.argv.slice(2).filter((a) => a !== "--");
+  const args = parseArgs({
+    args: rawArgs,
+    options: {
+      amount: { type: "string", default: "2" },
+      memo: { type: "string", default: "0xdac17f958d2ee523a2206206994597c13d831ec7" },
+      fund: { type: "string", default: "3" },
+    },
+  }).values;
 
-console.log(`→ creating throwaway testnet sender account (fund ${fundHbar} ℏ)`);
+  const OPERATOR_ID = required("OPERATOR_ACCOUNT_ID");
+  const OPERATOR_KEY = required("OPERATOR_PRIVATE_KEY");
+  const amountHbar = Number(args.amount);
+  const fundHbar = Number(args.fund);
+  const memo = String(args.memo);
 
-const newKey = PrivateKey.generateECDSA();
-const create = await new AccountCreateTransaction()
-  .setKey(newKey.publicKey)
-  .setInitialBalance(Hbar.from(fundHbar))
-  .execute(client);
-const createReceipt = await create.getReceipt(client);
-const senderId = createReceipt.accountId!;
-console.log(`  sender account id: ${senderId.toString()}`);
+  if (!Number.isFinite(amountHbar) || amountHbar <= 0) {
+    console.error("invalid --amount");
+    process.exit(1);
+  }
+  if (fundHbar < amountHbar) {
+    console.error("--fund must be >= --amount (plus enough for fees)");
+    process.exit(1);
+  }
 
-// Use senderKey-signed transfer so it pays the fees (like an exchange withdrawal).
-client.setOperator(senderId, newKey);
+  const client = Client.forTestnet();
+  const operatorId = AccountId.fromString(OPERATOR_ID);
+  const operatorKey = parseKey(OPERATOR_KEY);
+  client.setOperator(operatorId, operatorKey);
 
-console.log(`→ sending ${amountHbar} ℏ from ${senderId.toString()} to ${operatorId.toString()} with memo "${memo}"`);
+  console.log(`→ creating throwaway testnet sender account (fund ${fundHbar} ℏ)`);
 
-const tx = await new TransferTransaction()
-  .addHbarTransfer(senderId, Hbar.from(-amountHbar))
-  .addHbarTransfer(operatorId, Hbar.from(amountHbar))
-  .setTransactionMemo(memo.slice(0, 100))
-  .execute(client);
+  const newKey = PrivateKey.generateECDSA();
+  const create = await new AccountCreateTransaction()
+    .setKey(newKey.publicKey)
+    .setInitialBalance(Hbar.from(fundHbar))
+    .execute(client);
+  const createReceipt = await create.getReceipt(client);
+  const senderId = createReceipt.accountId!;
+  console.log(`  sender account id: ${senderId.toString()}`);
 
-const receipt = await tx.getReceipt(client);
-if (receipt.status !== Status.Success) {
-  console.error(`✗ transfer failed: ${receipt.status.toString()}`);
-  process.exit(2);
+  // Use sender-signed transfer so the exchange-like sender pays the fees.
+  client.setOperator(senderId, newKey);
+
+  console.log(`→ sending ${amountHbar} ℏ from ${senderId.toString()} to ${operatorId.toString()} with memo "${memo}"`);
+
+  const tx = await new TransferTransaction()
+    .addHbarTransfer(senderId, Hbar.from(-amountHbar))
+    .addHbarTransfer(operatorId, Hbar.from(amountHbar))
+    .setTransactionMemo(memo.slice(0, 100))
+    .execute(client);
+
+  const receipt = await tx.getReceipt(client);
+  if (receipt.status !== Status.Success) {
+    console.error(`✗ transfer failed: ${receipt.status.toString()}`);
+    process.exit(2);
+  }
+
+  const record = await tx.getRecord(client);
+  console.log(`✓ transfer tx id: ${record.transactionId.toString()}`);
+  console.log(`  consensus: ${record.consensusTimestamp?.toString() ?? "?"}`);
+  console.log(`  hashscan: https://hashscan.io/testnet/transaction/${encodeURIComponent(record.transactionId.toString())}`);
+  console.log("");
+  console.log("Detector should pick this up within ~1s. Watch the explorer at http://localhost:3000.");
+
+  client.close();
 }
 
-const record = await tx.getRecord(client);
-console.log(`✓ transfer tx id: ${record.transactionId.toString()}`);
-console.log(`  consensus: ${record.consensusTimestamp?.toString() ?? "?"}`);
-console.log(`  hashscan: https://hashscan.io/testnet/transaction/${encodeURIComponent(record.transactionId.toString())}`);
-console.log("");
-console.log("Detector should pick this up within ~1s. Watch the explorer at http://localhost:3000.");
-
-client.close();
+main().catch((err) => {
+  console.error("seed failed:", err);
+  process.exit(1);
+});

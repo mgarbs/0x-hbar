@@ -1,44 +1,197 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,500;1,9..144,700;1,9..144,900&family=Figtree:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
   color-scheme: dark;
+  --font-sans: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --px-grid: 24px;
 }
 
-html, body {
-  background: theme('colors.bg');
-  color: theme('colors.text');
+* {
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+html {
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: #07070B;
+  color: #F4F4F8;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Atmospheric base: dot grid + radial brand glow. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: 0 0;
+  mask-image: radial-gradient(ellipse 100% 80% at 50% 0%, black 0%, black 40%, transparent 90%);
+  -webkit-mask-image: radial-gradient(ellipse 100% 80% at 50% 0%, black 0%, black 40%, transparent 90%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+      ellipse 80% 50% at 50% -10%,
+      rgba(130, 89, 239, 0.35) 0%,
+      rgba(130, 89, 239, 0.09) 25%,
+      rgba(34, 211, 238, 0.04) 50%,
+      transparent 75%
+    ),
+    linear-gradient(180deg, rgba(7, 7, 11, 0) 0%, rgba(7, 7, 11, 0.6) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#__next,
+main {
+  position: relative;
+  z-index: 1;
+}
+
+/* Selection */
+::selection {
+  background: rgba(130, 89, 239, 0.45);
+  color: #fff;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 99px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  background-clip: padding-box;
+}
+
+/* Typography utilities */
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-variation-settings: "SOFT" 30, "WONK" 0;
+  }
+  .italic-display {
+    font-style: italic;
+    font-variation-settings: "SOFT" 80, "WONK" 1;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .stepped {
+    font-feature-settings: "ss02";
+  }
 }
 
 @layer components {
-  .card {
-    @apply rounded-xl bg-panel border border-border p-5;
+  .eyebrow {
+    @apply text-[10px] uppercase tracking-[0.18em] text-ink-mute font-mono font-medium;
   }
-  .card-hover {
-    @apply transition-colors hover:border-brand/60;
+
+  .panel {
+    @apply bg-surface-raised rounded-2xl shadow-subtle;
+    position: relative;
   }
-  .pill {
-    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium uppercase tracking-wider;
+  .panel-lift {
+    @apply bg-surface-elevated rounded-2xl shadow-lift;
+    position: relative;
   }
-  .mono {
-    @apply font-mono;
+
+  .panel-glow::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(130, 89, 239, 0.55), rgba(34, 211, 238, 0.25) 60%, transparent 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
   }
+
+  .hairline {
+    @apply h-px w-full;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.08) 20%,
+      rgba(130, 89, 239, 0.28) 50%,
+      rgba(255, 255, 255, 0.08) 80%,
+      transparent 100%
+    );
+  }
+
+  .pill-base {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-mono font-medium uppercase tracking-[0.18em];
+  }
+
   .link {
-    @apply text-brand2 hover:underline;
+    @apply text-aqua hover:text-aqua-bright transition-colors underline-offset-4 hover:underline decoration-aqua/40;
+  }
+
+  .kbd {
+    @apply inline-flex items-center rounded border border-rule-strong bg-surface-raised px-1.5 py-0.5 text-[10px] font-mono text-ink-dim;
+  }
+
+  .dot-live {
+    @apply relative inline-block w-2 h-2 rounded-full bg-good;
+  }
+  .dot-live::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 999px;
+    box-shadow: 0 0 0 0 rgba(16, 217, 163, 0.55);
+    animation: pulseDot 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .dot-off {
+    @apply inline-block w-2 h-2 rounded-full bg-bad/80;
+  }
+
+  /* HashScan-style data table row */
+  .row {
+    @apply grid items-center gap-x-4 px-4 py-3 border-b border-rule-subtle transition-colors;
+  }
+  .row:hover {
+    background: linear-gradient(
+      90deg,
+      rgba(130, 89, 239, 0.05) 0%,
+      rgba(130, 89, 239, 0.02) 50%,
+      rgba(34, 211, 238, 0.04) 100%
+    );
+  }
+  .row-new {
+    animation: tickerIn 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
   }
 }
-
-.dot {
-  width: 8px; height: 8px; border-radius: 999px; display: inline-block;
-}
-.dot.live { background: theme('colors.success'); box-shadow: 0 0 0 4px hsl(142 70% 45% / 0.2); animation: pulse 2s infinite; }
-.dot.offline { background: theme('colors.danger'); }
-
-@keyframes pulse {
-  0%,100% { box-shadow: 0 0 0 0 hsl(142 70% 45% / 0.4); }
-  50% { box-shadow: 0 0 0 8px hsl(142 70% 45% / 0); }
-}
-
-.scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
-.scroll-thin::-webkit-scrollbar-thumb { background: theme('colors.border'); border-radius: 8px; }

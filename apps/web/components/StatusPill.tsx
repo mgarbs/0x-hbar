@@ -1,18 +1,47 @@
 import clsx from "clsx";
 
-const MAP: Record<string, { label: string; tone: string }> = {
-  detected:        { label: "detected",       tone: "bg-panel2 text-muted border border-border" },
-  validated:       { label: "validated",      tone: "bg-brand/10 text-brand border border-brand/40" },
-  forwarding:      { label: "forwarding",     tone: "bg-brand/20 text-brand border border-brand/60" },
-  forwarded:       { label: "forwarded",      tone: "bg-success/15 text-success border border-success/50" },
-  confirmed:       { label: "confirmed",      tone: "bg-success/20 text-success border border-success/60" },
-  kept_malformed:  { label: "malformed memo", tone: "bg-warning/15 text-warning border border-warning/50" },
-  below_minimum:   { label: "below minimum",  tone: "bg-warning/10 text-warning border border-warning/40" },
-  failed_retry:    { label: "retrying",       tone: "bg-danger/10 text-danger border border-danger/40" },
-  operator_review: { label: "review",         tone: "bg-danger/20 text-danger border border-danger/60" },
+type Tone = "neutral" | "brand" | "aqua" | "good" | "warn" | "bad";
+
+const MAP: Record<string, { label: string; tone: Tone; icon: string }> = {
+  detected:        { label: "detected",       tone: "neutral", icon: "◌" },
+  validated:       { label: "validated",      tone: "brand",   icon: "◆" },
+  forwarding:      { label: "forwarding",     tone: "brand",   icon: "↻" },
+  forwarded:       { label: "forwarded",      tone: "aqua",    icon: "→" },
+  confirmed:       { label: "confirmed",      tone: "good",    icon: "✓" },
+  kept_malformed:  { label: "kept · memo",    tone: "warn",    icon: "×" },
+  below_minimum:   { label: "kept · below min", tone: "warn",  icon: "×" },
+  failed_retry:    { label: "retrying",       tone: "bad",     icon: "⟳" },
+  operator_review: { label: "review",         tone: "bad",     icon: "!" },
 };
 
-export function StatusPill({ status }: { status: string }) {
-  const entry = MAP[status] ?? { label: status, tone: "bg-panel2 text-muted border border-border" };
-  return <span className={clsx("pill", entry.tone)}>{entry.label}</span>;
+const TONES: Record<Tone, string> = {
+  neutral: "bg-surface-lift text-ink-dim border-rule",
+  brand: "bg-brand/10 text-brand-bright border-brand/30",
+  aqua: "bg-aqua/10 text-aqua-bright border-aqua/30",
+  good: "bg-good/10 text-good border-good/30",
+  warn: "bg-warn/10 text-warn border-warn/30",
+  bad: "bg-bad/10 text-bad border-bad/40",
+};
+
+export function StatusPill({ status, compact = false }: { status: string; compact?: boolean }) {
+  const entry = MAP[status] ?? { label: status, tone: "neutral" as Tone, icon: "·" };
+  return (
+    <span className={clsx("pill-base border", TONES[entry.tone], compact && "text-[9px] py-0.5 px-2")}>
+      <span className="opacity-80">{entry.icon}</span>
+      {entry.label}
+    </span>
+  );
+}
+
+export function StatusDot({ status }: { status: string }) {
+  const entry = MAP[status] ?? { tone: "neutral" as Tone };
+  const cls = {
+    neutral: "bg-ink-mute",
+    brand: "bg-brand",
+    aqua: "bg-aqua",
+    good: "bg-good",
+    warn: "bg-warn",
+    bad: "bg-bad",
+  }[entry.tone];
+  return <span className={`w-1.5 h-1.5 rounded-full ${cls}`} />;
 }

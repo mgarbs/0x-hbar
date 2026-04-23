@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: 0xhbar-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: 0xhbar
+      POSTGRES_PASSWORD: 0xhbar
+      POSTGRES_DB: 0xhbar
+    ports:
+      - "5432:5432"
+    volumes:
+      - 0xhbar-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U 0xhbar -d 0xhbar"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+volumes:
+  0xhbar-pgdata:

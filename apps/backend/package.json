@@ -1,0 +1,33 @@
+{
+  "name": "@0xhbar/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "seed:deposit": "tsx ../../scripts/seed-deposit.ts"
+  },
+  "dependencies": {
+    "@0xhbar/db": "workspace:*",
+    "@0xhbar/hedera": "workspace:*",
+    "@0xhbar/types": "workspace:*",
+    "@hashgraph/sdk": "^2.57.0",
+    "@hono/node-server": "^1.13.7",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.38.3",
+    "hono": "^4.6.15",
+    "pino": "^9.5.0",
+    "pino-pretty": "^13.0.0",
+    "postgres": "^3.4.5",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

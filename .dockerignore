@@ -1,0 +1,13 @@
+node_modules
+.pnpm-store
+.turbo
+**/dist
+**/.next
+**/out
+.env
+.env.local
+.git
+.github
+apps/web/node_modules
+coverage
+*.log

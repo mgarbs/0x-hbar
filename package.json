@@ -1,0 +1,28 @@
+{
+  "name": "0x-hbar",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.28.2",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "setup": "pnpm install && docker compose up -d postgres && sleep 2 && pnpm --filter @0xhbar/db run migrate",
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "db:migrate": "pnpm --filter @0xhbar/db run migrate",
+    "db:studio": "pnpm --filter @0xhbar/db run studio",
+    "db:generate": "pnpm --filter @0xhbar/db run generate",
+    "seed:deposit": "pnpm --filter @0xhbar/backend run seed:deposit",
+    "backend": "pnpm --filter @0xhbar/backend run dev",
+    "web": "pnpm --filter @0xhbar/web run dev"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.3",
+    "@types/node": "^22.10.7",
+    "tsx": "^4.19.2"
+  }
+}

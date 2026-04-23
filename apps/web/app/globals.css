@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html, body {
+  background: theme('colors.bg');
+  color: theme('colors.text');
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl bg-panel border border-border p-5;
+  }
+  .card-hover {
+    @apply transition-colors hover:border-brand/60;
+  }
+  .pill {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium uppercase tracking-wider;
+  }
+  .mono {
+    @apply font-mono;
+  }
+  .link {
+    @apply text-brand2 hover:underline;
+  }
+}
+
+.dot {
+  width: 8px; height: 8px; border-radius: 999px; display: inline-block;
+}
+.dot.live { background: theme('colors.success'); box-shadow: 0 0 0 4px hsl(142 70% 45% / 0.2); animation: pulse 2s infinite; }
+.dot.offline { background: theme('colors.danger'); }
+
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 0 hsl(142 70% 45% / 0.4); }
+  50% { box-shadow: 0 0 0 8px hsl(142 70% 45% / 0); }
+}
+
+.scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+.scroll-thin::-webkit-scrollbar-thumb { background: theme('colors.border'); border-radius: 8px; }

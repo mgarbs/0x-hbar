@@ -1,0 +1,43 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [".env", ".env.local"],
+  "globalEnv": [
+    "DATABASE_URL",
+    "HEDERA_NETWORK",
+    "HEDERA_MIRROR_BASE",
+    "OPERATOR_ACCOUNT_ID",
+    "OPERATOR_PRIVATE_KEY",
+    "TREASURY_ACCOUNT_ID",
+    "OPERATOR_FEE_BPS",
+    "HOLLOW_CREATE_TINYBARS",
+    "NETWORK_FEE_BUDGET_TINYBARS",
+    "DETECTOR_POLL_INTERVAL_MS",
+    "EXECUTOR_CONCURRENCY",
+    "API_PORT",
+    "API_CORS_ORIGIN",
+    "NEXT_PUBLIC_API_BASE"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "out/**", "!.next/cache/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "lint": {
+      "outputs": []
+    },
+    "migrate": {
+      "cache": false
+    },
+    "generate": {
+      "cache": false
+    }
+  }
+}

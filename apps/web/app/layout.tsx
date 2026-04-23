@@ -1,6 +1,29 @@
 import type { Metadata, Viewport } from "next";
+import { Fraunces, Figtree, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+  weight: ["300", "500", "700", "900"],
+  style: ["normal", "italic"],
+});
+
+const figtree = Figtree({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
 
 export const metadata: Metadata = {
   title: "0x-hbar · exchange → EVM HBAR router",
@@ -22,8 +45,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
-      <body className="min-h-screen antialiased bg-surface-deep text-ink">
+    <html
+      lang="en"
+      className={`dark ${fraunces.variable} ${figtree.variable} ${jetbrainsMono.variable}`}
+    >
+      <body className="min-h-screen antialiased bg-surface-deep text-ink font-sans">
         <Providers>{children}</Providers>
       </body>
     </html>
